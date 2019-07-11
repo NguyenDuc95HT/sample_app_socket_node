@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>chat</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js"></script>
+    <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+    <style>
+
+    </style>
+</head>
+<body>
+    <h1>Chat</h1>
+    <div id="name-user">
+        <p>name</p>
+        <input type="text" id="username"> <button id="setname" onclick="setName()" >Set name</button>
+    </div>
+    <br>
+    <div id="chat">
+        <ul id="messages"></ul>
+
+        <div style="background: #000; padding: 3px; position: fixed; bottom: 0; width: 100%;">
+            <input  style="border: 0; padding: 10px; width: 87%; margin-right: .5%; " id="m" autocomplete="off"/>
+            <button style="width: 9%; background: rgb(130, 224, 255); border: none; padding: 10px;" id="sendbt" onclick="send()" >Send</button>
+        </div>
+
+
+    </div>
+
+<script>
+
+    const socket = io('http://localhost:3000');
+        $('#name-user').show();
+        $('#chat').hide();
+
+    socket.emit('connection');
+        socket.on('client-connected', () => {
+            $('#name-user').hide();
+            $('#chat').show();
+        })
+
+    $('#setname').click(() => {
+        let username = document.getElementById('username').value;
+        console.log(username);
+        socket.emit('setname', username);
+    });
+
+    $('#sendbt').click(() => {
+        let msg = document.getElementById('m').value;
+        socket.emit('message', msg);
+        document.getElementById('m').value = '';
+    });
+
+    socket.on('message', (data) => {
+        $('#messages').append(`<li>${data.username}: ${data.message}</li>`);
+    })
+
+</script>
+</body>
+</html>
